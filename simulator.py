@@ -31,13 +31,6 @@ if args.debug:
 
 ######## helper functions ########
 
-def replaceLRU(toCheck):
-	if toCheck in cacheList:
-		cacheList.remove(toCheck)
-		cacheList.appendleft(toCheck)
-	else:
-		cacheList.appendleft(toCheck)
-
 # parse the user-input size string, returns the size in bytes
 def parse_size(size):
 	try:
