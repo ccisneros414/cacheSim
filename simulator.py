@@ -52,8 +52,11 @@ def parse_size(size):
 	return s
 
 #read from file
+if ".gz" in args.file:
+	f = gzip.open(args.file,"r")
+else:
+	f = open(args.file,"r")
 
-f = gzip.open(args.file,"r")
 assoc = int(args.assoc)
 cacheSize = parse_size(args.size)
 cacheList = collections.deque([], maxlen=(cacheSize // cache_line_size))
@@ -74,10 +77,16 @@ for line in f:
 	sepLine = line.split()
 	if len(sepLine) != 3:continue
 	sepLine[0] = sepLine[0][:-1]
+<<<<<<< HEAD
 	sepLine[2] = sepLine[2].strip("\n")
 	cache.setTag(sepLine[2])
 	newLine = Line()
 	newLine.address = sepLine[2]	
+=======
+        sepLine[2] = sepLine[2].strip("\n")
+	cache.setTag(sepLine[2])
+        #print(sepLine)
+>>>>>>> 12b98770aa2f29481d970ff7b7181de9ee199da0
 	total+=1
 	if sepLine[1] == "R":
 		if assoc == 0 or assoc >= (cacheSize // cache_line_size) : # Full associative
@@ -128,6 +137,13 @@ for line in f:
 		
 
 
+<<<<<<< HEAD
 print misses, total
 print "Cache miss rate: ",round((float(misses)/float(total)*100),2),"% "
+=======
+#for c in cacheList:
+#	print(c)
+print misses, total
+print "Cache miss rate: ",(float(misses)/float(total))*100,"% "
+>>>>>>> 12b98770aa2f29481d970ff7b7181de9ee199da0
 

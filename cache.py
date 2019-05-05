@@ -39,7 +39,11 @@ class Cache:
 			iTag = i.tag
 			#print "iTag =", iTag, "tag =", tag, "i.valid =", i.valid
 			if iTag == tag and i.valid == 1:
+<<<<<<< HEAD
                 #print iTag, tag
+=======
+                                #print iTag, tag
+>>>>>>> 12b98770aa2f29481d970ff7b7181de9ee199da0
 				#update LRU order
 				self.adjustLRU(setNum, i)
 				return True	
