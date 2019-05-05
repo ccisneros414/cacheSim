@@ -52,7 +52,7 @@ def parse_size(size):
 
 #read from file
 
-f = open(args.file,"r")
+f = gzip.open(args.file,"r")
 assoc = int(args.assoc)
 cacheSize = parse_size(args.size)
 cacheList = collections.deque([], maxlen=(cacheSize // cache_line_size))
@@ -71,7 +71,9 @@ hits = 0
 for line in f:
 	sepLine = line.split()
 	sepLine[0] = sepLine[0][:-1]
-	#print(sepLine)
+        sepLine[2] = sepLine[2].strip("\n")
+	cache.setTag(sepLine[2])
+        #print(sepLine)
 	total+=1
 	if sepLine[1] == "R":
 		if assoc == 0 or assoc >= (cacheSize // cache_line_size) : # Full associative
@@ -98,6 +100,6 @@ for line in f:
 
 #for c in cacheList:
 #	print(c)
-
+print misses, total
 print "Cache miss rate: ",(float(misses)/float(total))*100,"% "
 
