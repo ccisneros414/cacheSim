@@ -30,7 +30,7 @@ args = parser.parse_args()
 if args.debug:
 	logging.basicConfig(level=logging.DEBUG)
 
-cache = Cache(args.size, cache_line_size, assoc) 
+
 
 ######## helper functions ########
 
@@ -51,55 +51,53 @@ def parse_size(size):
 	return s
 
 #read from file
-print("Start of Cache")
-print(args.file)
-f = open(args.file,"r")
-assoc = args.assoc
-cacheSize = parse_size(args.size)
 
-cacheList = collections.deque([], maxlen=cacheSize)
+f = open(args.file,"r")
+assoc = int(args.assoc)
+cacheSize = parse_size(args.size)
+cacheList = collections.deque([], maxlen=(cacheSize // cache_line_size))
+if args.assoc != 0:
+	cache = Cache(cacheSize, cache_line_size, assoc)
 hitCount = 0
 missCount = 0
 total = 0
 i=0
-blockSize = 0
-
-'''
-if assoc > 1:
-	while i<:
-		block = collections.deque([],maxlen=(cacheSize/assoc))
-		cacheList.appendleft(block)
-		i+=1
-'''
-for c in cacheList:
-	print(c)
+blockSize = 0 
+misses = 0
+hits = 0
+#for c in cacheList:
+#	print(c)
 
 for line in f:
 	sepLine = line.split()
 	sepLine[0] = sepLine[0][:-1]
 	#print(sepLine)
 	total+=1
-	
-	if assoc == 0:
-		if sepLine[2] in cacheList:
-			#print("hit")
-			cacheList.remove(sepLine[2])
-			cacheList.appendleft(sepLine[2])
-			hitCount+=1
-			continue
-		else:
-			#print("miss")
-			missCount +=1
-			cacheList.appendleft(sepLine[2])
+	if sepLine[1] == "R":
+		if assoc == 0 or assoc >= (cacheSize // cache_line_size) : # Full associative
+			if sepLine[2] in cacheList:
+				#print("hit")
+				cacheList.remove(sepLine[2])
+				cacheList.appendleft(sepLine[2])
+				hits+=1
+				continue
+			else:
+				#print("miss")
+				misses +=1
+				cacheList.appendleft(sepLine[2])
 
-	#elif assoc > 1:
-	#	print("set associativity")
-	#elif assoc == 1:
-	#	print("full associativity")
+		elif assoc >= 1: # N-Way associative
+			if cache.checkBlock(sepLine[2]):
+				hits += 1
+			else:
+				misses += 1
+	else:
+		print "write command"
+		
 
 
-for c in cacheList:
-	print(c)
+#for c in cacheList:
+#	print(c)
 
-print("Cache miss rate: ",(float(missCount)/float(total))," % ")
+print "Cache miss rate: ",(float(misses)/float(total))*100,"% "
 
