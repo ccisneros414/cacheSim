@@ -4,6 +4,7 @@ import math
 import logging
 import gzip
 import collections
+from cache import Cache
 
 ######## constants ##############
 cache_line_size = 64
@@ -28,6 +29,8 @@ parser.add_argument('--print', dest='enable_print', action='store_const',
 args = parser.parse_args()
 if args.debug:
 	logging.basicConfig(level=logging.DEBUG)
+
+cache = Cache(args.size, cache_line_size, assoc) 
 
 ######## helper functions ########
 

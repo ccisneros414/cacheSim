@@ -2,7 +2,7 @@ class Line:
 
     # Class for line in cache
 
-    def __init__(self, size):
+    def __init__(self):
         self.valid = 0
         self.tag = 0
-        self.data = [0] * size
+        self.data = [0] * 64
