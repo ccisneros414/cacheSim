@@ -53,7 +53,7 @@ def parse_size(size):
 
 #read from file
 
-f = gzip.open(args.file,"r")
+f = open(args.file,"r")
 assoc = int(args.assoc)
 cacheSize = parse_size(args.size)
 cacheList = collections.deque([], maxlen=(cacheSize // cache_line_size))
