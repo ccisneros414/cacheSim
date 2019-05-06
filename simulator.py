@@ -60,7 +60,7 @@ cacheList = collections.deque([], maxlen=(cacheSize // cache_line_size))
 
 if assoc != 0:
 	cache = Cache(cacheSize, cache_line_size, assoc)
-elif assc == 0 or assoc >= (cacheSize //cache_line_size):
+elif assoc == 0 or assoc >= (cacheSize //cache_line_size):
 	for i in range(cacheSize//cache_line_size):
 		cacheList.append(Line())
 
@@ -75,7 +75,8 @@ for line in f:
 	if len(sepLine) != 3:continue
 	sepLine[0] = sepLine[0][:-1]
 	sepLine[2] = sepLine[2].strip("\n")
-	cache.setTag(sepLine[2])
+	if assoc != 0 and assoc < (cacheSize //cache_line_size):
+		cache.setTag(sepLine[2])
 	newLine = Line()
 	newLine.address = sepLine[2]	
 	total+=1
@@ -83,7 +84,9 @@ for line in f:
 		if assoc == 0 or assoc >= (cacheSize // cache_line_size) : # Full associative
 			hmFlag = 0
 			for l in cacheList:
-				if newLine.address == l.address and l.valid == 1:
+				#print newLine.address,l.address,l.valid
+				if newLine.address == l.address:
+					print "match"
 					cacheList.remove(l)
 					newLine.valid == 1
 					cacheList.appendleft(newLine)
@@ -94,9 +97,11 @@ for line in f:
 			else:
 				#never found match
 				misses +=1
-				newLine.valid == 1
+				#newLine.valid == 1
 				newLine.dirty == 0
-				cacheList.appendLeft(newLine)
+				cacheList.appendleft(newLine)
+				cacheList[0].valid == 1
+
 		elif assoc >= 1: # N-Way associative
 			if cache.checkBlock(sepLine[2]):
 				hits += 1
@@ -106,7 +111,7 @@ for line in f:
 		if assoc == 0 or assoc >= (cacheSize // cache_line_size):
 			hmFlag = 0
 			for l in cacheList:
-				if newLine.address == l.address and l.valid==1:
+				if newLine.address == l.address:
 					cacheList.remove(l)
 					newLine.valid == 1
 					newLine.dirty == 1
@@ -119,7 +124,7 @@ for line in f:
 				misses +=1
 				newLine.valid == 1
 				newLine.dirty == 1
-				cacheList.appendLeft(newLine)
+				cacheList.appendleft(newLine)
 		elif assoc>=1:# N-Way assoc
 			if cache.checkBlockWrite(sepLine[2]):
 				hits += 1
