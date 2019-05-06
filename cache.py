@@ -39,20 +39,41 @@ class Cache:
 			iTag = i.tag
 			#print "iTag =", iTag, "tag =", tag, "i.valid =", i.valid
 			if iTag == tag and i.valid == 1:
+<<<<<<< HEAD
+                #print iTag, tag
+=======
                                 #print iTag, tag
+>>>>>>> 12b98770aa2f29481d970ff7b7181de9ee199da0
 				#update LRU order
-				if i.stale == 1:
-					i.stale=0 # Adjust stale flag; Write fresh data to memory
 				self.adjustLRU(setNum, i)
 				return True	
 		newLine = Line()
 		newLine.address = strAddr
 		newLine.valid = 1
+		newLine.dirty = 0
 		newLine.tag = tag
 		self._lines[setNum].appendleft(newLine) # Add it to our cache.
 		return False
-	#def writeBlock(self, addr):
-	# writeBlock handles the case where we need to write to
+    def checkBlockWrite(self, strAddr):
+		# checkBlockWrite handles the case where we need to write to
+		tag = self.pullTag(strAddr)
+		setNum = self.pullSet(strAddr)
+		set = self._lines[setNum]
+		for i in set:
+			iTag = i.tag
+			if iTag == tag and i.valid ==1:
+			#update LRU order
+				i.dirty = 1
+				self.adjustLRU(setNum,i)
+				return True
+		newLine = Line()
+		newLine.address = strAddr
+		newLine.valid = 1
+		newLine.dirty = 1
+		newLine.tag = tag
+		self._lines[setNum].appendleft(newLine)
+		return False
+
     def pullSet(self, addr):
         # Gets the set in our cache based on address given
         # Returns index of address' set

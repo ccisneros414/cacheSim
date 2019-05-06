@@ -5,6 +5,7 @@ import logging
 import gzip
 import collections
 from cache import Cache
+from line import Line
 
 ######## constants ##############
 cache_line_size = 64
@@ -51,55 +52,98 @@ def parse_size(size):
 	return s
 
 #read from file
+if ".gz" in args.file:
+	f = gzip.open(args.file,"r")
+else:
+	f = open(args.file,"r")
 
-f = gzip.open(args.file,"r")
 assoc = int(args.assoc)
 cacheSize = parse_size(args.size)
 cacheList = collections.deque([], maxlen=(cacheSize // cache_line_size))
-if args.assoc != 0:
+
+if assoc != 0:
 	cache = Cache(cacheSize, cache_line_size, assoc)
-hitCount = 0
-missCount = 0
+elif assc == 0 or assoc >= (cacheSize //cache_line_size):
+	for i in range(cacheSize//cache_line_size):
+		cacheList.append(Line())
+
 total = 0
 i=0
 blockSize = 0 
 misses = 0
 hits = 0
-#for c in cacheList:
-#	print(c)
-
+hmFlag = 0
 for line in f:
 	sepLine = line.split()
+	if len(sepLine) != 3:continue
 	sepLine[0] = sepLine[0][:-1]
+<<<<<<< HEAD
+	sepLine[2] = sepLine[2].strip("\n")
+	cache.setTag(sepLine[2])
+	newLine = Line()
+	newLine.address = sepLine[2]	
+=======
         sepLine[2] = sepLine[2].strip("\n")
 	cache.setTag(sepLine[2])
         #print(sepLine)
+>>>>>>> 12b98770aa2f29481d970ff7b7181de9ee199da0
 	total+=1
 	if sepLine[1] == "R":
 		if assoc == 0 or assoc >= (cacheSize // cache_line_size) : # Full associative
-			if sepLine[2] in cacheList:
-				#print("hit")
-				cacheList.remove(sepLine[2])
-				cacheList.appendleft(sepLine[2])
-				hits+=1
-				continue
+			hmFlag = 0
+			for l in cacheList:
+				if newLine.address == l.address and l.valid == 1:
+					cacheList.remove(l)
+					newLine.valid == 1
+					cacheList.appendleft(newLine)
+					hmFlag = 1
+					break
+			if(hmFlag == 1):
+				hits += 1
 			else:
-				#print("miss")
+				#never found match
 				misses +=1
-				cacheList.appendleft(sepLine[2])
-
+				newLine.valid == 1
+				newLine.dirty == 0
+				cacheList.appendLeft(newLine)
 		elif assoc >= 1: # N-Way associative
 			if cache.checkBlock(sepLine[2]):
 				hits += 1
 			else:
 				misses += 1
 	else:
-		print "write command"
+		if assoc == 0 or assoc >= (cacheSize // cache_line_size):
+			hmFlag = 0
+			for l in cacheList:
+				if newLine.address == l.address and l.valid==1:
+					cacheList.remove(l)
+					newLine.valid == 1
+					newLine.dirty == 1
+					cacheList.appendleft(newLine)
+					hmFlag = 1
+					break
+			if(hmFlag == 1):
+				hits +=1
+			else:
+				misses +=1
+				newLine.valid == 1
+				newLine.dirty == 1
+				cacheList.appendLeft(newLine)
+		elif assoc>=1:# N-Way assoc
+			if cache.checkBlockWrite(sepLine[2]):
+				hits += 1
+			else:
+				misses += 1
 		
 
 
+<<<<<<< HEAD
+print misses, total
+print "Cache miss rate: ",round((float(misses)/float(total)*100),2),"% "
+=======
 #for c in cacheList:
 #	print(c)
 print misses, total
 print "Cache miss rate: ",(float(misses)/float(total))*100,"% "
+>>>>>>> 12b98770aa2f29481d970ff7b7181de9ee199da0
 
