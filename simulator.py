@@ -60,7 +60,7 @@ cacheList = collections.deque([], maxlen=(cacheSize // cache_line_size))
 
 if assoc != 0:
 	cache = Cache(cacheSize, cache_line_size, assoc)
-elif assoc == 0 or assoc >= (cacheSize //cache_line_size):
+elif assoc == 0 or assoc > (cacheSize //cache_line_size):
 	for i in range(cacheSize//cache_line_size):
 		cacheList.append(Line())
 
@@ -81,12 +81,12 @@ for line in f:
 	newLine.address = sepLine[2]	
 	total+=1
 	if sepLine[1] == "R":
-		if assoc == 0 or assoc >= (cacheSize // cache_line_size) : # Full associative
+		if assoc == 0 or assoc > (cacheSize // cache_line_size) : # Full associative
 			hmFlag = 0
 			for l in cacheList:
 				#print newLine.address,l.address,l.valid
 				if newLine.address == l.address:
-					print "match"
+					#print "match"
 					cacheList.remove(l)
 					newLine.valid == 1
 					cacheList.appendleft(newLine)
@@ -108,7 +108,7 @@ for line in f:
 			else:
 				misses += 1
 	else:
-		if assoc == 0 or assoc >= (cacheSize // cache_line_size):
+		if assoc == 0 or assoc > (cacheSize // cache_line_size):
 			hmFlag = 0
 			for l in cacheList:
 				if newLine.address == l.address:
@@ -133,6 +133,6 @@ for line in f:
 		
 
 
-print misses, total
+#print misses, total
 print "Cache miss rate: ",round((float(misses)/float(total)*100),2),"% "
 
